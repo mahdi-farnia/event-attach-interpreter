@@ -1,0 +1,33 @@
+{
+  "name": "event-attach-interpreter",
+  "version": "1.0.0",
+  "description": "add or remove or emit events with template strings",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "is-plain-object": "^5.0.0"
+  },
+  "scripts": {
+    "test": "node test/index.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahdi-farnia/event-attach-interpreter.git"
+  },
+  "keywords": [
+    "event",
+    "event-attacher",
+    "event-listener",
+    "template-string",
+    "interpreter"
+  ],
+  "author": "Mahdi Farnia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mahdi-farnia/event-attach-interpreter/issues"
+  },
+  "homepage": "https://github.com/mahdi-farnia/event-attach-interpreter#readme"
+}
