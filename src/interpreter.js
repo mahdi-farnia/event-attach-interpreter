@@ -4,6 +4,8 @@ class Interpreter {
    */
   init(text) {
     this.text = text;
+    this.len = text.length;
+    this.word = '';
     this.nextCharIndex = 0;
     this.parseObj = {};
     this.resetAction();
@@ -24,35 +26,34 @@ class Interpreter {
    * @private
    */
   readText() {
-    let len = this.text.length,
-      word = '';
-    const { Terminators: terminators } = Interpreter.Expectations;
+    const { Terminators: terminators } = Interpreter.Expectations,
+      char = this.getCurrentChar(),
+      stringEnded = this.len === this.nextCharIndex - 1;
 
-    while (1) {
-      const char = this.getCurrentChar(),
-        stringEnded = len === this.nextCharIndex - 1;
+    if (
+      (stringEnded || terminators.indexOf(char) > -1) &&
+      !Interpreter.isEmptyString(this.word)
+    ) {
+      this.readWords();
 
-      if (
-        (stringEnded || terminators.some((t) => t === char)) &&
-        !Interpreter.isEmptyString(word)
-      ) {
-        this.readWords(word);
+      if (stringEnded) return this.saveStoredData();
 
-        if (stringEnded) return this.saveStoredData();
-
-        word = '';
-
-        if (char === ':') this.storeAsEvent = false;
-        if (char === ';') {
+      switch (char) {
+        case ':':
+          this.storeAsEvent = false;
+          break;
+        case ';':
           this.saveStoredData();
           this.resetAction();
-        }
-        continue;
+          break;
       }
 
-      // Added if block for two or more terminators
-      if (!Interpreter.isEmptyString(char)) word += char;
+      return this.readText();
     }
+
+    // Added if block for two or more terminators
+    if (!Interpreter.isEmptyString(char)) this.word += char;
+    this.readText();
   }
 
   /**
@@ -65,36 +66,49 @@ class Interpreter {
   /**
    * @private
    */
-  readWords(word) {
-    const lowerCased = word.toLowerCase(),
-      isValid = this.expectKeywordType.some(
-        (t) => t === 'any' || t === lowerCased
-      );
+  readWords() {
+    const isValid = this.expectKeywordType.some(
+      (t) => t === 'any' || t === this.word.toLowerCase()
+    );
 
-    if (!isValid) {
-      throw new Error(
-        `Interpreter Error: Expect '${this.expectKeywordType.join(
-          "' or '"
-        )}' but found '${word}'`
-      );
-    }
-    const { AnyType: AnyType, ActionTypes } = Interpreter.Expectations;
+    if (!isValid) return this.syntaxError();
 
-    if (this.expectKeywordType === ActionTypes) {
-      this.actionType = lowerCased;
+    const { AnyType, ActionTypes } = Interpreter.Expectations;
 
-      if (!Array.isArray(this.parseObj[lowerCased]))
-        this.parseObj[lowerCased] = [];
-    } else this.store(word);
-
+    this.expectKeywordType === ActionTypes ? this.grabAction() : this.store();
     this.expectKeywordType = AnyType;
+    this.word = '';
   }
 
   /**
    * @private
    */
-  store(word) {
-    this.storeAsEvent ? this.events.push(word) : this.parameters.push(word);
+  syntaxError() {
+    throw new Error(
+      `Interpreter Error: Expect '${this.expectKeywordType.join(
+        "' or '"
+      )}' but found '${this.word}'`
+    );
+  }
+
+  /**
+   * @private
+   */
+  grabAction() {
+    const lowerCased = this.word.toLowerCase();
+    this.actionType = lowerCased;
+
+    if (!Array.isArray(this.parseObj[lowerCased]))
+      this.parseObj[lowerCased] = [];
+  }
+
+  /**
+   * @private
+   */
+  store() {
+    this.storeAsEvent
+      ? this.events.push(this.word)
+      : this.parameters.push(this.word);
   }
 
   /**
