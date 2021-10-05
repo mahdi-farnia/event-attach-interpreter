@@ -23,6 +23,9 @@ const store = {
 };
 const attacher = new Attacher(emitter).params(store);
 
+// Must warn for log method which is undefined
+attacher.parse('on echo: log', { log: undefined });
+
 // Test stored parameters
 strictEqual(
   attacher.hasParams(Object.keys(store)),

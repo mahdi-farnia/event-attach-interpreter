@@ -71,11 +71,28 @@ class Attacher extends Interpreter {
           return events.forEach((ev) => this.emitter[action](ev, ...params));
         }
 
-        params.forEach((p) =>
-          events.forEach((ev) => this.emitter[action](ev, p))
-        );
+        params.forEach((_param) => {
+          let typeofParam;
+          if ((typeofParam = typeof _param) !== 'function') {
+            const key = parameters.find((key) => data[key] === _param);
+            return this.nonFunctionWarn(action, events, key, typeofParam);
+          }
+
+          events.forEach((ev) => this.emitter[action](ev, _param));
+        });
       });
     }
+  }
+
+  /**
+   * @private
+   */
+  nonFunctionWarn(action, events, key, actualType) {
+    console.warn(
+      `WARN Event Attacher: Adding listener for method: '${action}' with events: '${events.join(
+        ', '
+      )}' with argument(s): '${key}' was skipped for preventing error. expect ${key} to be a 'function' but received '${actualType}'`
+    );
   }
 }
 
