@@ -1,6 +1,6 @@
 {
   "name": "event-attach-interpreter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "add or remove or emit events with template strings",
   "main": "index.js",
   "types": "index.d.ts",
