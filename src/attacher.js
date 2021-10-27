@@ -1,4 +1,4 @@
-const { isPlainObject } = require('is-plain-object');
+const isPlainObject = require('./is-plain-object');
 const Interpreter = require('./interpreter');
 const EventEmitter = require('events');
 

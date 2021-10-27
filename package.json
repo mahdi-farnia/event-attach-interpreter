@@ -7,9 +7,6 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {
-    "is-plain-object": "^5.0.0"
-  },
   "scripts": {
     "test": "node test/index.test.js"
   },
